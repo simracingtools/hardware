@@ -15,4 +15,20 @@ Then I saw similar panel on [aliexpress.com](https://de.aliexpress.com/item/12V-
     <tr>
         <td>Starter Panel</td><td>https://de.aliexpress.com/item/12V-20A-Carbon-Faser-Sim-Racing-Auto-Z-ndung-Schalter-Ersatz-Panel-Push-Start-anzeige-licht/32913185496.html</td><td>15 €</td>
     </tr>
+    <tr>
+        <td>Teensy 2.0</td><td>https://de.aliexpress.com/item/Winzig-2-0-Winzig-USB-Entwicklung-Bord/32857413855.html</td><td>7 €</td>
+    </tr>
+    <tr>
+        <td>Plastic box 150x115x75 mm</td><td>Where you can find it</td><td>&lt; 10€</td>
+    </tr>
+    <tr><td colspan="3">Optional it you want the light in the safety switch</td></tr>
+    <tr>
+        <td>12DC power supply</td><td>https://de.aliexpress.com/item/Hohe-Qualit-t-Hat-Netzteil-DC-12-V-1A-2A-3A-5A-6A-7A-8A-10A/32990654263.html</td><td>2 €</td>
+    </tr>
+    <tr>
+        <td>12 DC Relay</td><td>https://de.aliexpress.com/item/Freies-Verschiffen-10-teile-los-HK4100f-DC12V-SHG-Relais-hk4100F-DC12V-HK4100F-12-V-DIP6-3A/32861475552.html</td><td>3 €</td>
+    </tr>
 </table>
+
+Some additional material like wires and soldering pins. All together should you cost not more than 40 €.
+
