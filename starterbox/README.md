@@ -40,6 +40,8 @@ The box should be at least 50mm in depth.
 You will need a programming environment for the Teensy microcontroller. I recommend [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html).
 Simply follow the [Download+Install](https://www.pjrc.com/teensy/td_download.html) guide on prjc.com
 
+The provided sketch is usable for iRacing. But you can easily adopt it to any other racing simulation which has key-shortcuts for engine starters.
+
 ## Building
 
 * Pre-wire the starter panel/relay accoring to the wiring diagram.
