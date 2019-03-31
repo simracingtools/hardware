@@ -49,3 +49,5 @@ The box should be at least 50mm in depth.
 ## Wiring diagram
 
 ![Starterbox wiring](images/WiringDiagram.png)
+
+![Insight](images/small/BoxInsight.jpg "Insight WITHOUT optional relay")
