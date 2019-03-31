@@ -35,6 +35,11 @@ Then I saw similar panel on [aliexpress.com](https://de.aliexpress.com/item/12V-
 Some additional material like wires, pin headers and adhesive pads. All together should you cost not more than 40 €.
 The box should be at least 50mm in depth.
 
+## Software requirements
+
+You will need a programming environment for the Teensy microcontroller. I recommend [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html).
+Simply follow the [Download+Install](https://www.pjrc.com/teensy/td_download.html) guide on prjc.com
+
 ## Building
 
 * Pre-wire the starter panel/relay accoring to the wiring diagram.
@@ -46,8 +51,18 @@ The box should be at least 50mm in depth.
 * Connect the Teensy and optional power supply.
 * Test and Happy Racing.
 
-## Wiring diagram
+### Wiring diagram
 
 ![Starterbox wiring](images/WiringDiagram.png)
 
+### Wiring WITHOUT optional relay
+
 ![Insight](images/small/BoxInsight.jpg "Insight WITHOUT optional relay")
+
+## Mounting
+
+I used a bent drywall connector as box mount. But any metal ankle will do the same. I used the shifter mount of my drive stand as mount base.
+
+![Insight](images/small/BoxMount.jpg)
+
+![Insight](images/small/BoxMounted.jpg)
