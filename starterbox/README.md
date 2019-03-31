@@ -6,6 +6,8 @@ The idea came to me when I saw [this Panel on Amazon](https://www.amazon.de/dp/B
 
 Then I saw similar panel on [aliexpress.com](https://de.aliexpress.com/item/12V-20A-Carbon-Faser-Sim-Racing-Auto-Z-ndung-Schalter-Ersatz-Panel-Push-Start-anzeige-licht/32913185496.html) and ordered it.
 
+![The Result](images/small/BoxInPlace.jpg)
+
 ## Parts
 
 <table>
@@ -30,5 +32,20 @@ Then I saw similar panel on [aliexpress.com](https://de.aliexpress.com/item/12V-
     </tr>
 </table>
 
-Some additional material like wires and soldering pins. All together should you cost not more than 40 €.
+Some additional material like wires, pin headers and adhesive pads. All together should you cost not more than 40 €.
+The box should be at least 50mm in depth.
 
+## Building
+
+* Pre-wire the starter panel/relay accoring to the wiring diagram.
+* Make the neccessary cutout in the box and mount the panel using the screws delivered with it.
+* Make a cutout for the mini USB plug and the optional power supply wire.
+* Solder wires or pin headers on the Teensy.
+* Mount the Teensy and optonal relay using adhesive pads.
+* Load the provided Teensyduino sketch into the Teensy.
+* Connect the Teensy and optional power supply.
+* Test and Happy Racing.
+
+## Wiring diagram
+
+![Starterbox wiring](images/WiringDiagram.png)
