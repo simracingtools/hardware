@@ -1,7 +1,14 @@
 # Simracing
+
 Simracing addons: Buttonboxes and Displays 
 
+The following functions are expected to be mapped on the steering wheel:
+
+* Brake bias settings
+* Any  
+
 ## [Starterbox](https://github.com/robbyb67/simracing/tree/master/starterbox)
+
 This is a box providing 
 
 * Ignition switch
@@ -10,10 +17,52 @@ This is a box providing
 * Traction control on/off switch
 
 Future features:
-* Rotary encoder for voice chat volume
-* Voice chat mute button
-* Mute driver button
-* Rotary encoder for radio channel select
 * Rotary encoder for traction control setting
 * Rotary encoder for ABS setting
 * Rotary encoder for engine mode
+
+## Future projects
+
+### iRacing race control button box
+
+Inspired by the [Simlogic box](https://www.simlogic-shop.com/home)
+
+![Simlogic Box](images/SimlogicBox.png)
+
+#### Planned Features:
+
+##### Stands section
+
+* Announce pitstop button
+* Clear tires button
+* Switch to select between read / oval
+* 2 way rocker switch to select left (rear) / right (front) tires depending on road/oval selection
+* Rotary encoder to select fuel refill w. push function to clear fuel
+
+##### Race section
+
+* Button to select absolute position black box
+* Button to select relative position black box
+* Button to select lap timing black box
+
+##### Radio section
+
+* Rotary encoder for voice chat volume w. push fuction to mute voice chat
+* Mute driver button
+* Rotary encoder for radio channel select
+
+##### Black box (UI) section
+
+* Rotary encoder to select black box value
+* Rotary encoder to increase/decrease selected black box value w. push function for value toggle
+* Button to select fuel black box
+* Button to select tire black box
+* Button to select in car black box
+* add. black box selection buttons
+* Rotary encoder to shift driving view up/down
+
+### SLIManager Teensy lights panel
+
+Some LED work: [V2R controller](http://www.eksimracing.com/help/getting-started-with-eksimracing-vtor-controller/)
+
+
