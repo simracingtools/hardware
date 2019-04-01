@@ -23,7 +23,7 @@ Future features:
 
 ## Future projects
 
-### iRacing race control button box
+### [iRacing race control button box](https://github.com/robbyb67/simracing/tree/master/rccbox)
 
 Inspired by the [Simlogic box](https://www.simlogic-shop.com/home)
 
@@ -47,9 +47,9 @@ Inspired by the [Simlogic box](https://www.simlogic-shop.com/home)
 
 ##### Radio section
 
-* Rotary encoder for voice chat volume w. push fuction to mute voice chat
+* Rotary encoder for voice chat volume w. push function to mute voice chat
 * Mute driver button
-* Rotary encoder for radio channel select
+* Rotary encoder for radio channel select w. push to display radio black box
 
 ##### Black box (UI) section
 
@@ -59,7 +59,7 @@ Inspired by the [Simlogic box](https://www.simlogic-shop.com/home)
 * Button to select tire black box
 * Button to select in car black box
 * add. black box selection buttons
-* Rotary encoder to shift driving view up/down
+* 2 way switch to shift driving view up/down
 
 ### SLIManager Teensy lights panel
 
