@@ -68,7 +68,14 @@ The box should be at least 50mm in depth.
 You will need a programming environment for the Teensy microcontroller. I recommend [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html).
 Simply follow the [Download+Install](https://www.pjrc.com/teensy/td_download.html) guide on prjc.com
 
-The provided sketch is usable for iRacing. But you can easily adopt it to any other racing simulation which has key-shortcuts for engine starters.
+The provided Arduino sketches are usable for iRacing. 
+
+There are two variants: One using keyboard mappings and another emulating joystick buttons. 
+
+Each variant can be configured by changing the KEY\_??? oder JOY\_BTN\_??? defines in the config.h file. Changes in pin assignments may also
+be made in config.h.
+
+So you should be able to easily adopt it to any other racing simulation and/or racing equipment.
 
 ## Building
 
