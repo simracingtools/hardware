@@ -95,7 +95,7 @@ The provided sketch is usable for iRacing. But you can easily adopt it to any ot
 
 ### Prewired encoders
 
-![Insight](images/small/PrewiredEncoders.jpg "Prewired Encoders")
+![Insight](images/small/PrewiredEncoders.jpg "Pre-wired Encoders")
 
 ## Mounting
 
