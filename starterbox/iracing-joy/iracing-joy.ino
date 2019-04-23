@@ -19,20 +19,31 @@
 
 */
 #include <Bounce.h>
+#include <Encoder.h>
+#include "config.h"
+
+#define RED_OFF digitalWrite(PIN_LED_RED, LOW)
+#define RED_ON digitalWrite(PIN_LED_RED, HIGH)
+#define BLUE_OFF digitalWrite(PIN_LED_BLUE, LOW)
+#define BLUE_ON digitalWrite(PIN_LED_BLUE, HIGH)
 
 // Create Bounce objects for each button.  The Bounce object
 // automatically deals with contact chatter or "bounce", and
 // it makes detecting changes very simple.
-Bounce button0 = Bounce(0, 10);
-Bounce button1 = Bounce(1, 10);  // 10 = 10 ms debounce time
-Bounce button2 = Bounce(2, 10);  // which is appropriate for
-Bounce button3 = Bounce(3, 10);  // most mechanical pushbuttons
-Bounce button4 = Bounce(4, 10);
-Bounce button5 = Bounce(5, 10);  // if a button is too "sensitive"
-Bounce button6 = Bounce(6, 10);  // to rapid touch, you can
-Bounce button7 = Bounce(7, 10);  // increase this time.
-Bounce button8 = Bounce(8, 10);
-Bounce button9 = Bounce(9, 10);
+// 10 = 10 ms debounce time
+Bounce swIgn = Bounce(PIN_SW_IGN, BOUNCE_TIME);
+Bounce btnStart = Bounce(PIN_BTN_START, BOUNCE_TIME);
+Bounce swPit = Bounce(PIN_SW_PIT, BOUNCE_TIME);
+//Bounce swTcr = Bounce(PIN_SW_TCR, BOUNCE_TIME);
+Bounce btnEng = Bounce(PIN_BTN_ENG, BOUNCE_TIME);
+Bounce btnAbs = Bounce(PIN_BTN_ABS, BOUNCE_TIME);
+Bounce btnTcr = Bounce(PIN_BTN_TCR, BOUNCE_TIME);
+
+Encoder ENG(PINS_ENC_ENG);
+Encoder ABS(PINS_ENC_ABS);
+Encoder TCR(PINS_ENC_TCR);
+
+boolean tcrMode, engMode;
 
 void setup() {
   // Configure the pins for input mode with pullup resistors.
@@ -45,93 +56,211 @@ void setup() {
   // convenient.  The scheme is called "active low", and it's
   // very commonly used in electronics... so much that the chip
   // has built-in pullup resistors!
-  pinMode(0, INPUT_PULLUP);
-  pinMode(1, INPUT_PULLUP);
-  pinMode(2, INPUT_PULLUP);
-  pinMode(3, INPUT_PULLUP);
-  pinMode(4, INPUT_PULLUP);
-  pinMode(5, INPUT_PULLUP);
-  pinMode(6, INPUT_PULLUP);  // Teensy++ LED, may need 1k resistor pullup
-  pinMode(7, INPUT_PULLUP);
-  pinMode(8, INPUT_PULLUP);
-  pinMode(9, INPUT_PULLUP);
+	  pinMode(PIN_SW_IGN, INPUT_PULLUP);
+	  pinMode(PIN_BTN_START, INPUT_PULLUP);
+	  pinMode(PIN_SW_PIT, INPUT_PULLUP);
+	  pinMode(PIN_SW_TCR, INPUT_PULLUP);
+	  pinMode(PIN_BTN_ENG, INPUT_PULLUP);
+	  pinMode(PIN_BTN_ABS, INPUT_PULLUP);
+	  pinMode(PIN_BTN_TCR, INPUT_PULLUP);
+	  pinMode(PIN_LED_RED, OUTPUT);        // red LED
+	  pinMode(PIN_LED_BLUE, OUTPUT);       // blue LED
+
+	  TCR.write(0);
+	  ABS.write(0);
+	  ENG.write(0);
+
+	  engMode = false;
+	  RED_ON;
+	  BLUE_OFF;
 }
 
-boolean btn1 = false;
-boolean btn3 = false;
-boolean btn4 = false;
+boolean btnJoyIgn = false;
+boolean btnJoyPit = false;
+boolean btnJoyTcr1Dec = false;
+boolean btnJoyTcr1Inc = false;
+boolean btnJoyTcr2Dec = false;
+boolean btnJoyTcr2Inc = false;
+boolean btnJoyAbsDec = false;
+boolean btnJoyAbsInc = false;
+boolean btnJoyEng1Dec = false;
+boolean btnJoyEng1Inc = false;
+boolean btnJoyEng2Dec = false;
+boolean btnJoyEng2Inc = false;
 
 void loop() {
   // Update all the buttons.  There should not be any long
   // delays in loop(), so this runs repetitively at a rate
   // faster than the buttons could be pressed and released.
-  button0.update();
-  button1.update();
-  button2.update();
-  button3.update();
-//  button4.update();
-//  button5.update();
-//  button6.update();
-//  button7.update();
-//  button8.update();
-//  button9.update();
+  swIgn.update();
+  btnStart.update();
+  swPit.update();
+  //swTcr.update();
+  btnEng.update();
+  btnAbs.update();
+  btnTcr.update();
+  tcrMode = digitalRead(PIN_SW_TCR);
 
-  // Check each button for "falling" edge.
-  // Type a message on the Keyboard when each button presses
-  // Update the Joystick buttons only upon changes.
-  // falling = high (not pressed - voltage from pullup resistor)
-  //           to low (pressed - button connects pin to ground)
+  long newTcr, newAbs, newEng;
 
   // Ignition Switch
-  if( btn1 ) {
-    Joystick.button(1, 0);
-    btn1 = false;
+  if( btnJoyIgn ) {
+    Joystick.button(JOY_BTN_IGN, 0);
+    btnJoyIgn = false;
   }
-  if (button0.fallingEdge()) {
+  if (swIgn.fallingEdge()) {
     //Keyboard.print("i");
-    Joystick.button(1, 1);
-    btn1 = true;
+    Joystick.button(JOY_BTN_IGN, 1);
+    btnJoyIgn = true;
   }
-  if( button0.risingEdge()) {
+  if( swIgn.risingEdge()) {
     //Keyboard.print("i");
-    Joystick.button(1, 1);
-    btn1 = true;
+    Joystick.button(JOY_BTN_IGN, 1);
+    btnJoyIgn = true;
   }
  
   // Engine start button - continously
-  if (button1.fallingEdge()) {
-    Joystick.button(2, 1);
+  if (btnStart.fallingEdge()) {
+    Joystick.button(JOY_BTN_START, 1);
   }
-  if( button1.risingEdge()) {
-    Joystick.button(2, 0);
+  if( btnStart.risingEdge()) {
+    Joystick.button(JOY_BTN_START, 0);
   }
 
   // ACC1 switch
-  if( btn3 ) {
-    Joystick.button(3, 0);
-    btn3 = false;
+  if( btnJoyPit ) {
+    Joystick.button(JOY_BTN_PIT, 0);
+    btnJoyPit = false;
   }
-  if (button2.fallingEdge()) {
-    Joystick.button(3, 1);
-    btn3 = true;
+  if (swPit.fallingEdge()) {
+    Joystick.button(JOY_BTN_PIT, 1);
+    btnJoyPit = true;
   }
-  if( button2.risingEdge()) {
-    Joystick.button(3, 1);
-    btn3 = true;
+  if( swPit.risingEdge()) {
+    Joystick.button(JOY_BTN_PIT, 1);
+    btnJoyPit = true;
   }
 
-  // ACC2 switch
-  if( btn4 ) {
-    Joystick.button(4, 0);
-    btn4 = false;
+  // TCR encoder push
+  if (btnTcr.fallingEdge()) {
+	  Joystick.button(JOY_BTN_TCR_TOGGLE, 1);
   }
-  if (button3.fallingEdge()) {
-    Joystick.button(4, 1);
-    btn4 = true;
+  if( btnTcr.risingEdge()) {
+	  Joystick.button(JOY_BTN_TCR_TOGGLE, 0);
   }
-  if( button3.risingEdge()) {
-    Joystick.button(4, 1);
-    btn4 = true;
+
+  newTcr = TCR.read();
+  if(newTcr < -ENC_STEPS) {
+    if( tcrMode ) {
+    	btnJoyTcr1Dec = true;
+    	Joystick.button(JOY_BTN_TCR1_DEC, 1);
+    } else {
+    	btnJoyTcr2Dec = true;
+    	Joystick.button(JOY_BTN_TCR2_DEC, 1);
+    }
+    TCR.write(0);
+   } else if( newTcr > ENC_STEPS ) {
+    if( tcrMode ) {
+    	btnJoyTcr1Inc = true;
+    	Joystick.button(JOY_BTN_TCR1_INC, 1);
+    } else {
+    	btnJoyTcr2Inc = true;
+    	Joystick.button(JOY_BTN_TCR2_INC, 1);
+    }
+    TCR.write(0);
+  }
+
+  if( btnJoyTcr1Dec ) {
+	  btnJoyTcr1Dec = false;
+  	Joystick.button(JOY_BTN_TCR1_DEC, 0);
+  }
+  if( btnJoyTcr2Dec ) {
+	  btnJoyTcr2Dec = false;
+  	Joystick.button(JOY_BTN_TCR2_DEC, 0);
+  }
+  if( btnJoyTcr1Inc ) {
+	  btnJoyTcr1Inc = false;
+  	Joystick.button(JOY_BTN_TCR1_INC, 0);
+  }
+  if( btnJoyTcr2Inc ) {
+	  btnJoyTcr2Inc = false;
+  	Joystick.button(JOY_BTN_TCR2_INC, 0);
+  }
+
+  // ABS encoder push
+  if (btnAbs.fallingEdge()) {
+	  Joystick.button(JOY_BTN_ABS_TOGGLE, 1);
+  }
+  if (btnAbs.risingEdge()) {
+	  Joystick.button(JOY_BTN_ABS_TOGGLE, 0);
+  }
+
+  newAbs = ABS.read();
+  if(newAbs < -ENC_STEPS) {
+	  btnJoyAbsDec = true;
+	  Joystick.button(JOY_BTN_ABS_DEC, 1);
+    ABS.write(0);
+  } else if( newAbs > ENC_STEPS ) {
+	  btnJoyAbsInc = true;
+	  Joystick.button(JOY_BTN_ABS_INC, 1);
+    ABS.write(0);
+  }
+  if( btnJoyAbsDec ) {
+	  btnJoyAbsDec = false;
+	  Joystick.button(JOY_BTN_ABS_DEC, 0);
+  }
+  if( btnJoyAbsInc ) {
+	  btnJoyAbsInc = false;
+	  Joystick.button(JOY_BTN_ABS_INC, 0);
+  }
+
+  // ENG encoder push
+  if (btnEng.risingEdge()) {
+    engMode = !engMode;
+  }
+  if( engMode ) {
+      RED_OFF;
+      BLUE_ON;
+  } else {
+      RED_ON;
+      BLUE_OFF;
+  }
+
+  newEng = ENG.read();
+  if(newEng < -ENC_STEPS) {
+    if( engMode ) {
+    	btnJoyEng1Dec = true;
+    	Joystick.button(JOY_BTN_ENG1_DEC, 1);
+    } else {
+    	btnJoyEng2Dec = true;
+    	Joystick.button(JOY_BTN_ENG2_DEC, 1);
+    }
+    ENG.write(0);
+   } else if( newEng > ENC_STEPS ) {
+    if( engMode ) {
+    	btnJoyEng1Inc = true;
+    	Joystick.button(JOY_BTN_ENG1_INC, 1);
+    } else {
+    	btnJoyEng2Inc = true;
+    	Joystick.button(JOY_BTN_ENG2_INC, 1);
+    }
+    ENG.write(0);
+  }
+  if( btnJoyEng1Dec ) {
+	  btnJoyEng1Dec = false;
+  	Joystick.button(JOY_BTN_ENG1_DEC, 0);
+  }
+  if( btnJoyEng2Dec ) {
+	  btnJoyEng2Dec = false;
+  	Joystick.button(JOY_BTN_ENG2_DEC, 0);
+  }
+  if( btnJoyEng1Inc ) {
+	  btnJoyEng1Inc = false;
+  	Joystick.button(JOY_BTN_ENG1_INC, 0);
+  }
+  if( btnJoyEng2Inc ) {
+	  btnJoyEng2Inc = false;
+  	Joystick.button(JOY_BTN_ENG2_INC, 0);
   }
 
   delay(100);
