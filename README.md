@@ -14,12 +14,11 @@ This is a box providing
 * Ignition switch
 * Starter button
 * Pit limiter switch
-* Traction control on/off switch
-
-Future features:
-* Rotary encoder for traction control setting
-* Rotary encoder for ABS setting
-* Rotary encoder for engine mode
+* Traction control 1/2 selection switch (for GTE cars)
+* Rotary encoder for traction control setting w. push function TC off
+* Rotary encoder for ABS setting w. push function ABS Toggle (for GT cars)
+* Rotary encoder for fuel mix/throttle shaping w. push function to switch between functions
+* LED to indicate selected engine setting (fuel mix or throttle shaping)
 
 ## Future projects
 
