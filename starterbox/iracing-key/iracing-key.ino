@@ -22,15 +22,10 @@
 #include <Encoder.h>
 #include "config.h"
 
-#define RED_OFF analogWrite(PIN_LED_RED, 0)
-#define RED_ON analogWrite(PIN_LED_RED, LED_BRIGHTNESS)
-#define BLUE_OFF analogWrite(PIN_LED_BLUE, 0)
-#define BLUE_ON analogWrite(PIN_LED_BLUE, LED_BRIGHTNESS)
-
 // Create Bounce objects for each button.  The Bounce object
 // automatically deals with contact chatter or "bounce", and
 // it makes detecting changes very simple.
-// 10 = 10 ms debounce time
+// 10 = 10 ms debounce time, here defined in config.h
 Bounce swIgn = Bounce(PIN_SW_IGN, BOUNCE_TIME);
 Bounce btnStart = Bounce(PIN_BTN_START, BOUNCE_TIME);
 Bounce swPit = Bounce(PIN_SW_PIT, BOUNCE_TIME);
@@ -38,13 +33,23 @@ Bounce btnEng = Bounce(PIN_BTN_ENG, BOUNCE_TIME);
 Bounce btnAbs = Bounce(PIN_BTN_ABS, BOUNCE_TIME);
 Bounce btnTcr = Bounce(PIN_BTN_TCR, BOUNCE_TIME);
 
+// Create encoder objects for the three encoders
 Encoder ENG(PINS_ENC_ENG);
 Encoder ABS(PINS_ENC_ABS);
 Encoder TCR(PINS_ENC_TCR);
 
-boolean engMode;
+// Encoder ENG has two functions depending this value;
+bool engMode, configMode;
+int  encSteps ledBrightness;
 
 void setup() {
+  // Initially disable config mode
+  configMode = false;
+
+  // Set initial config values
+  encSteps = ENC_STEPS;
+  ledBrightness = LED_BRIGHTNESS;
+  
   // Configure the pins for input mode with pullup resistors.
   // The pushbuttons connect from each pin to ground.  When
   // the button is pressed, the pin reads LOW because the button
@@ -62,29 +67,37 @@ void setup() {
   pinMode(PIN_BTN_ENG, INPUT_PULLUP);
   pinMode(PIN_BTN_ABS, INPUT_PULLUP);
   pinMode(PIN_BTN_TCR, INPUT_PULLUP);
+  
+  // Configure output pins for the red and blue LED
   pinMode(PIN_LED_RED, OUTPUT);        // red LED
   pinMode(PIN_LED_BLUE, OUTPUT);       // blue LED
 
+  // Initialize the encoders with position zero.
   TCR.write(0);
   ABS.write(0);
   ENG.write(0);
 
+  // Initialize engine mode and set initial LED state
   engMode = false;
-  RED_ON; 
-  BLUE_OFF;
+  analogWrite(PIN_LED_RED, ledBrightness);
+  analogWrite(PIN_LED_BLUE, 0);
 }
 
+// Handle an encoder. The encoder is only checked for turn direction,
+// it behaves like an up/down switch.
 void handleEncoder(Encoder* enc, String up, String down) {
   long encVal = enc->read();
-  if(encVal < -ENC_STEPS) {
+  if(encVal < (-1 * encSteps)) {
     Keyboard.print(down);
     enc->write(0);
-  } else if( encVal > ENC_STEPS ) {
+  } else if( encVal > encSteps ) {
     Keyboard.print(up);
     enc->write(0);
   }
 }
 
+// Handle a momentary push button. Used for the push function
+// of the encoders and the engine start button. 
 void handleButton(Bounce* btn, int key) {
   if(btn->fallingEdge()) {
     Keyboard.press(key);
@@ -94,6 +107,8 @@ void handleButton(Bounce* btn, int key) {
   }
 }
 
+// Handle a on/off switch. Each state change of the switch behaves like a
+// momentary button press. The switch position is not relevant.
 void handleSwitch(Bounce* sw, String key) {
   if(sw->fallingEdge()) {
     Keyboard.print(key);
@@ -103,9 +118,10 @@ void handleSwitch(Bounce* sw, String key) {
   }
 }
 
-void loop() {
+void normalOp() {
   boolean tcrMode;
-  
+
+  // update the button objects
   swIgn.update();
   btnStart.update();
   swPit.update();
@@ -122,10 +138,12 @@ void loop() {
   // ACC1 switch - pit limiter
   handleSwitch(&swPit, KEY_PIT);
 
+  // ACC2 switch - switch position controls which TC is changed by the encoder
+  tcrMode = digitalRead(PIN_SW_TCR);
+
   // TCR encoder
   handleButton(&btnTcr, KEY_TCR_TOGGLE);
 
-  tcrMode = digitalRead(PIN_SW_TCR);
   if( tcrMode ) {
       handleEncoder(&TCR, KEY_TCR1_INC, KEY_TCR1_DEC);
   } else {
@@ -136,19 +154,62 @@ void loop() {
   handleButton(&btnAbs, KEY_ABS_TOGGLE);
   handleEncoder(&ABS, KEY_ABS_INC, KEY_ABS_DEC);
   
-  // ENG encoder push
+  // ENG encoder push - toggles between two engine settings and reflect
+  // the selected setting by changing LED status.
   if (btnEng.risingEdge()) {
     engMode = !engMode;
-  }
-  if( engMode ) {
-    RED_OFF;
-    BLUE_ON;
-	handleEncoder(&ENG, KEY_ENG1_INC, KEY_ENG1_DEC);
-  } else {
-    RED_ON;
-    BLUE_OFF;
-  	handleEncoder(&ENG, KEY_ENG2_INC, KEY_ENG2_DEC);
+    if( engMode ) {
+      analogWrite(PIN_LED_RED, 0);
+      analogWrite(PIN_LED_BLUE, ledBrightness);
+    } else {
+      analogWrite(PIN_LED_RED, ledBrightness);
+      analogWrite(PIN_LED_BLUE, 0);
+    }
   }
   
+  // ENG encoder
+  if( engMode ) {
+	handleEncoder(&ENG, KEY_ENG1_INC, KEY_ENG1_DEC);
+  } else {
+  	handleEncoder(&ENG, KEY_ENG2_INC, KEY_ENG2_DEC);
+  }
+}
+
+void configOp() {
+  // Light up both LED to signal config mode
+  analogWrite(PIN_LED_RED, ledBrightness);
+  analogWrite(PIN_LED_BLUE, ledBrightness);
+
+  // ENG encoder controls LED brightness;
+  ledBrightness = ENG.read();
+
+  // ABS encoder controls encoder sensitivity
+  encSteps = ABS.read();
+}
+
+// Sketch main loop
+void loop() {
+
+  // Determine if to enter config mode.
+  if( !digitalRead(PIN_SW_IGN) ) {
+    // Ignition switch must be off
+    if( digitalRead(PIN_BTN_ENG) && digitalRead(PIN_BTN_ABS) ) {
+      // Enter config mode if ENG and ABS encoders are pushed the same time
+      configMode = true;
+      TCR.write(0);
+      ABS.write(encSteps);
+      ENG.write(ledBrightness);
+    }
+  } else {
+    // Toggling ignition switch leaves config mode. 
+    configMode = false;
+  }
+
+  if( configMode ) {
+    configOp();
+  } else {
+    normalOp();
+  }
+
   delay(50);
 }
