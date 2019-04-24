@@ -22,10 +22,10 @@
 #include <Encoder.h>
 #include "config.h"
 
-#define RED_OFF digitalWrite(PIN_LED_RED, LOW)
-#define RED_ON digitalWrite(PIN_LED_RED, HIGH)
-#define BLUE_OFF digitalWrite(PIN_LED_BLUE, LOW)
-#define BLUE_ON digitalWrite(PIN_LED_BLUE, HIGH)
+#define RED_OFF analogWrite(PIN_LED_RED, 0)
+#define RED_ON analogWrite(PIN_LED_RED, LED_BRIGHTNESS)
+#define BLUE_OFF analogWrite(PIN_LED_BLUE, 0)
+#define BLUE_ON analogWrite(PIN_LED_BLUE, LED_BRIGHTNESS)
 
 // Create Bounce objects for each button.  The Bounce object
 // automatically deals with contact chatter or "bounce", and
@@ -34,7 +34,6 @@
 Bounce swIgn = Bounce(PIN_SW_IGN, BOUNCE_TIME);
 Bounce btnStart = Bounce(PIN_BTN_START, BOUNCE_TIME);
 Bounce swPit = Bounce(PIN_SW_PIT, BOUNCE_TIME);
-//Bounce swTcr = Bounce(PIN_SW_TCR, BOUNCE_TIME);
 Bounce btnEng = Bounce(PIN_BTN_ENG, BOUNCE_TIME);
 Bounce btnAbs = Bounce(PIN_BTN_ABS, BOUNCE_TIME);
 Bounce btnTcr = Bounce(PIN_BTN_TCR, BOUNCE_TIME);
@@ -43,7 +42,7 @@ Encoder ENG(PINS_ENC_ENG);
 Encoder ABS(PINS_ENC_ABS);
 Encoder TCR(PINS_ENC_TCR);
 
-boolean tcrMode, engMode;
+boolean engMode;
 
 void setup() {
   // Configure the pins for input mode with pullup resistors.
@@ -75,123 +74,81 @@ void setup() {
   BLUE_OFF;
 }
 
+void handleEncoder(Encoder* enc, String up, String down) {
+  long encVal = enc->read();
+  if(encVal < -ENC_STEPS) {
+    Keyboard.print(down);
+    enc->write(0);
+  } else if( encVal > ENC_STEPS ) {
+    Keyboard.print(up);
+    enc->write(0);
+  }
+}
+
+void handleButton(Bounce* btn, int key) {
+  if(btn->fallingEdge()) {
+    Keyboard.press(key);
+  }
+  if(btn->risingEdge()) {
+    Keyboard.release(key);
+  }
+}
+
+void handleSwitch(Bounce* sw, String key) {
+  if(sw->fallingEdge()) {
+    Keyboard.print(key);
+  }
+  if(sw->risingEdge()) {
+    Keyboard.print(key);
+  }
+}
 
 void loop() {
-  // Update all the buttons.  There should not be any long
-  // delays in loop(), so this runs repetitively at a rate
-  // faster than the buttons could be pressed and released.
+  boolean tcrMode;
+  
   swIgn.update();
   btnStart.update();
   swPit.update();
-  //swTcr.update();
   btnEng.update();
   btnAbs.update();
   btnTcr.update();
-  tcrMode = digitalRead(PIN_SW_TCR);
-
-  long newTcr, newAbs, newEng;
-  
-  // Check each button for "falling" edge.
-  // Type a message on the Keyboard when each button presses
-  // Update the Joystick buttons only upon changes.
-  // falling = high (not pressed - voltage from pullup resistor)
-  //           to low (pressed - button connects pin to ground)
 
   // Ignition Switch
-  if (swIgn.fallingEdge()) {
-    Keyboard.print(KEY_IGN);
-  }
-  if( swIgn.risingEdge()) {
-    Keyboard.print(KEY_IGN);
-  }
+  handleSwitch(&swIgn, KEY_IGN);
 
-  // Engine start button - continously
-  if (btnStart.fallingEdge()) {
-    Keyboard.press(KEY_START);
-  }
-  if( btnStart.risingEdge()) {
-    Keyboard.release(KEY_START);
-  }
+  // Engine start button
+  handleButton(&btnStart, KEY_START);
 
   // ACC1 switch - pit limiter
-  if (swPit.fallingEdge()) {
-    Keyboard.print(KEY_PIT);
-  }
-  if( swPit.risingEdge()) {
-    Keyboard.print(KEY_PIT);
+  handleSwitch(&swPit, KEY_PIT);
+
+  // TCR encoder
+  handleButton(&btnTcr, KEY_TCR_TOGGLE);
+
+  tcrMode = digitalRead(PIN_SW_TCR);
+  if( tcrMode ) {
+      handleEncoder(&TCR, KEY_TCR1_INC, KEY_TCR1_DEC);
+  } else {
+      handleEncoder(&TCR, KEY_TCR2_INC, KEY_TCR2_DEC);
   }
 
-  // TCR encoder push
-  if (btnTcr.fallingEdge()) {
-    Keyboard.press(KEY_TCR_TOGGLE);
-  }
-  if( btnTcr.risingEdge()) {
-    Keyboard.release(KEY_TCR_TOGGLE);
-  }
-
-  newTcr = TCR.read();
-  if(newTcr < -ENC_STEPS) {
-    if( tcrMode ) {
-      Keyboard.print(KEY_TCR1_DEC);
-    } else {
-      Keyboard.print(KEY_TCR2_DEC);
-    }
-    TCR.write(0);
-   } else if( newTcr > ENC_STEPS ) {
-    if( tcrMode ) {
-      Keyboard.print(KEY_TCR1_INC);
-    } else {
-      Keyboard.print(KEY_TCR2_INC);
-    }
-    TCR.write(0);
-  }
-
-  // ABS encoder push
-  if (btnAbs.fallingEdge()) {
-    Keyboard.press(KEY_ABS_TOGGLE);
-  }
-  if (btnAbs.risingEdge()) {
-    Keyboard.release(KEY_ABS_TOGGLE);
-  }
- 
-  newAbs = ABS.read();
-  if(newAbs < -ENC_STEPS) {
-    Keyboard.print(KEY_ABS_DEC);
-    ABS.write(0);
-  } else if( newAbs > ENC_STEPS ) {
-    Keyboard.print(KEY_ABS_INC);
-    ABS.write(0);
-  }
+  // ABS encoder
+  handleButton(&btnAbs, KEY_ABS_TOGGLE);
+  handleEncoder(&ABS, KEY_ABS_INC, KEY_ABS_DEC);
   
   // ENG encoder push
   if (btnEng.risingEdge()) {
     engMode = !engMode;
   }
   if( engMode ) {
-      RED_OFF;
-      BLUE_ON;
+    RED_OFF;
+    BLUE_ON;
+	handleEncoder(&ENG, KEY_ENG1_INC, KEY_ENG1_DEC);
   } else {
-      RED_ON;
-      BLUE_OFF;
+    RED_ON;
+    BLUE_OFF;
+  	handleEncoder(&ENG, KEY_ENG2_INC, KEY_ENG2_DEC);
   }
   
-  newEng = ENG.read();
-  if(newEng < -ENC_STEPS) {
-    if( engMode ) {
-      Keyboard.print(KEY_ENG1_DEC);
-    } else {
-      Keyboard.print(KEY_ENG2_DEC);
-    }
-    ENG.write(0);
-   } else if( newEng > ENC_STEPS ) {
-    if( engMode ) {
-      Keyboard.print(KEY_ENG1_INC);
-    } else {
-      Keyboard.print(KEY_ENG2_INC);
-    }
-    ENG.write(0);
-  }
- 
-
   delay(50);
 }

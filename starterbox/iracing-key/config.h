@@ -30,3 +30,4 @@
 #define PINS_ENC_TCR 7,14    // TCR encoder pins
 
 #define BOUNCE_TIME 10       // Bounce delay for button lib
+#define LED_BRIGHTNESS 128   // PWM value for LED brightness 
