@@ -23,13 +23,13 @@
 #define PIN_BTN_ENG    4      // ENG push
 #define PIN_BTN_ABS    17     // ABS push
 #define PIN_BTN_TCR    18     // TCR push
-#define PIN_LED_RED    19     // LED red
-#define PIN_LED_BLUE   20     // LED blue
+#define PIN_LED_RED    10     // LED red
+#define PIN_LED_BLUE   9      // LED blue
 #define PINS_ENC_ENG   5,16   // Engine encoder pins
 #define PINS_ENC_ABS   6,15   // ABS encoder pins
 #define PINS_ENC_TCR   7,14   // TCR encoder pins
 
 // Configuration definitions
-#define ENC_STEPS      4      // Encoder sensitivity
+#define ENC_STEPS      8      // Encoder sensitivity
 #define BOUNCE_TIME    10     // Bounce delay for buttons
-#define LED_BRIGHTNESS 128    // PWM value for LED brightness 
+#define LED_BRIGHTNESS 12     // PWM value for LED brightness 

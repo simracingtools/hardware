@@ -40,7 +40,7 @@ Encoder TCR(PINS_ENC_TCR);
 
 // Encoder ENG has two functions depending this value;
 bool engMode, configMode;
-int  encSteps ledBrightness;
+int  encSteps, ledBrightness;
 
 void setup() {
   // Initially disable config mode
@@ -179,21 +179,29 @@ void configOp() {
   // Light up both LED to signal config mode
   analogWrite(PIN_LED_RED, ledBrightness);
   analogWrite(PIN_LED_BLUE, ledBrightness);
+  btnEng.update();
+  btnAbs.update();
 
   // ENG encoder controls LED brightness;
   ledBrightness = ENG.read();
+  if(btnEng.risingEdge()) {
+    Keyboard.println("LED brightness " + String(ledBrightness));
+  }
 
   // ABS encoder controls encoder sensitivity
   encSteps = ABS.read();
+  if(btnAbs.risingEdge()) {
+    Keyboard.println("Encoder sensitivitz " + String(encSteps));
+  }
 }
 
 // Sketch main loop
 void loop() {
 
   // Determine if to enter config mode.
-  if( !digitalRead(PIN_SW_IGN) ) {
+  if( digitalRead(PIN_SW_IGN) ) {
     // Ignition switch must be off
-    if( digitalRead(PIN_BTN_ENG) && digitalRead(PIN_BTN_ABS) ) {
+    if( !digitalRead(PIN_BTN_ENG) && !digitalRead(PIN_BTN_ABS) ) {
       // Enter config mode if ENG and ABS encoders are pushed the same time
       configMode = true;
       TCR.write(0);
@@ -203,6 +211,13 @@ void loop() {
   } else {
     // Toggling ignition switch leaves config mode. 
     configMode = false;
+    if( engMode ) {
+      analogWrite(PIN_LED_RED, 0);
+      analogWrite(PIN_LED_BLUE, ledBrightness);
+    } else {
+      analogWrite(PIN_LED_RED, ledBrightness);
+      analogWrite(PIN_LED_BLUE, 0);
+    }
   }
 
   if( configMode ) {
