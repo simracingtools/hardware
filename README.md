@@ -20,11 +20,6 @@ This is a box providing
 * Rotary encoder for ENGine fuel mix/throttle shaping w. push function to switch between functions
 * LED to indicate selected engine setting (fuel mix or throttle shaping)
 
-LED brightness and encoder sensitivity are configurable. To enter config mode press ENG and ABS encoder while Ignition switch is off.
-Both LED light up to indicate config mode. You can now set LED brightness with the ENG encoder and the encoder sensitivity with the ABS encoder.
-While in config mode a push on ENG encoder will print the current LED brightness value, a push on ABS encoder prints the current encoder sensitivity
-value. To leave config mode switch ignition on.
-
 ## Future projects
 
 ### [iRacing race control button box](https://github.com/robbyb67/simracing/tree/master/rccbox)
