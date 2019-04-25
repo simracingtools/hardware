@@ -20,6 +20,7 @@
 */
 #include <Bounce.h>
 #include <Encoder.h>
+#include <EEPROM.h>
 #include "config.h"
 
 // Create Bounce objects for each button.  The Bounce object
@@ -40,15 +41,24 @@ Encoder TCR(PINS_ENC_TCR);
 
 // Encoder ENG has two functions depending this value;
 bool engMode, configMode;
-int  encSteps, ledBrightness;
+
+struct Config {
+	int encSteps;
+	int ledBrightness;
+} 
+
+Config config;
 
 void setup() {
   // Initially disable config mode
   configMode = false;
 
-  // Set initial config values
-  encSteps = ENC_STEPS;
-  ledBrightness = LED_BRIGHTNESS;
+  // Set initial config values, first try to read from EEPROM
+  EEPROM.get(CONFIG_ADDRESS, config);
+  if( config.encSteps == 0 ) {
+    config.encSteps = ENC_STEPS;
+    config.ledBrightness = LED_BRIGHTNESS;
+  }
   
   // Configure the pins for input mode with pullup resistors.
   // The pushbuttons connect from each pin to ground.  When
@@ -79,7 +89,7 @@ void setup() {
 
   // Initialize engine mode and set initial LED state
   engMode = false;
-  analogWrite(PIN_LED_RED, ledBrightness);
+  analogWrite(PIN_LED_RED, config.ledBrightness);
   analogWrite(PIN_LED_BLUE, 0);
 }
 
@@ -87,10 +97,10 @@ void setup() {
 // it behaves like an up/down switch.
 void handleEncoder(Encoder* enc, String up, String down) {
   long encVal = enc->read();
-  if(encVal < (-1 * encSteps)) {
+  if(encVal < (-1 * config.encSteps)) {
     Keyboard.print(down);
     enc->write(0);
-  } else if( encVal > encSteps ) {
+  } else if( encVal > config.encSteps ) {
     Keyboard.print(up);
     enc->write(0);
   }
@@ -160,9 +170,9 @@ void normalOp() {
     engMode = !engMode;
     if( engMode ) {
       analogWrite(PIN_LED_RED, 0);
-      analogWrite(PIN_LED_BLUE, ledBrightness);
+      analogWrite(PIN_LED_BLUE, config.ledBrightness);
     } else {
-      analogWrite(PIN_LED_RED, ledBrightness);
+      analogWrite(PIN_LED_RED, config.ledBrightness);
       analogWrite(PIN_LED_BLUE, 0);
     }
   }
@@ -177,21 +187,21 @@ void normalOp() {
 
 void configOp() {
   // Light up both LED to signal config mode
-  analogWrite(PIN_LED_RED, ledBrightness);
-  analogWrite(PIN_LED_BLUE, ledBrightness);
+  analogWrite(PIN_LED_RED, config.ledBrightness);
+  analogWrite(PIN_LED_BLUE, config.ledBrightness);
   btnEng.update();
   btnAbs.update();
 
   // ENG encoder controls LED brightness;
-  ledBrightness = ENG.read();
+  config.ledBrightness = ENG.read();
   if(btnEng.risingEdge()) {
-    Keyboard.println("LED brightness " + String(ledBrightness));
+    Keyboard.println("LED brightness " + String(config.ledBrightness));
   }
 
   // ABS encoder controls encoder sensitivity
-  encSteps = ABS.read();
+  config.encSteps = ABS.read();
   if(btnAbs.risingEdge()) {
-    Keyboard.println("Encoder sensitivitz " + String(encSteps));
+    Keyboard.println("Encoder sensitivitz " + String(config.encSteps));
   }
 }
 
@@ -205,17 +215,18 @@ void loop() {
       // Enter config mode if ENG and ABS encoders are pushed the same time
       configMode = true;
       TCR.write(0);
-      ABS.write(encSteps);
-      ENG.write(ledBrightness);
+      ABS.write(config.encSteps);
+      ENG.write(config.ledBrightness);
     }
   } else {
     // Toggling ignition switch leaves config mode. 
     configMode = false;
+    EEPROM.update(CONFIG_ADDRESS, config);
     if( engMode ) {
       analogWrite(PIN_LED_RED, 0);
-      analogWrite(PIN_LED_BLUE, ledBrightness);
+      analogWrite(PIN_LED_BLUE, config.ledBrightness);
     } else {
-      analogWrite(PIN_LED_RED, ledBrightness);
+      analogWrite(PIN_LED_RED, config.ledBrightness);
       analogWrite(PIN_LED_BLUE, 0);
     }
   }

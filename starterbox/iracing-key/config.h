@@ -30,6 +30,7 @@
 #define PINS_ENC_TCR   7,14   // TCR encoder pins
 
 // Configuration definitions
-#define ENC_STEPS      8      // Encoder sensitivity
+#define ENC_STEPS      8      // Default encoder sensitivity
+#define LED_BRIGHTNESS 12     // Default PWM value for LED brightness 
 #define BOUNCE_TIME    10     // Bounce delay for buttons
-#define LED_BRIGHTNESS 12     // PWM value for LED brightness 
+#define CONFIG_ADDRESS 0      // EEPROM address for config data
