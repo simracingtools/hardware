@@ -48,9 +48,9 @@ struct Config {
 	int encSteps;
 	int ledBrightness;
 	bool joystickMode;
-} 
+}; 
 
-Config config;
+Config config = { ENC_STEPS, LED_BRIGHTNESS, JOYSTICK_MODE};
 
 void setup() {
   // Initially disable config mode
@@ -209,7 +209,7 @@ void normalOpKeyboard() {
 
   // update the button objects
   updateButtons();
-  
+
   // Ignition Switch
   handleSwitchKey(&swIgn, KEY_IGN);
 
@@ -241,7 +241,7 @@ void normalOpKeyboard() {
   
   // ENG encoder
   if( engMode ) {
-	handleEncoderKey(&ENG, KEY_ENG1_INC, KEY_ENG1_DEC);
+	  handleEncoderKey(&ENG, KEY_ENG1_INC, KEY_ENG1_DEC);
   } else {
   	handleEncoderKey(&ENG, KEY_ENG2_INC, KEY_ENG2_DEC);
   }
@@ -284,18 +284,19 @@ void normalOpJoystick() {
   
   // ENG encoder
   if( engMode ) {
-	handleEncoderJoy(&ENG, JOY_BTN_ENG1_INC, JOY_BTN_ENG1_DEC);
+	  handleEncoderJoy(&ENG, JOY_BTN_ENG1_INC, JOY_BTN_ENG1_DEC);
   } else {
   	handleEncoderJoy(&ENG, JOY_BTN_ENG2_INC, JOY_BTN_ENG2_DEC);
   }
 }
 
-void blinkLed(int pin, int times, int interval) {
+void blinkLed(int pin, int times, int ms) {
   for( int i = 0; i < times; i++ ) {
-    analogWrite(pin, 0);
-    delay(interval);
-    analogWrite(pin, config.ledBrightness);
+    digitalWrite(pin, LOW);
+    delay(ms);
+    digitalWrite(pin, HIGH);
   }  
+  analogWrite(pin, config.ledBrightness);
 }
 
 void configOp() {
@@ -304,11 +305,12 @@ void configOp() {
   analogWrite(PIN_LED_BLUE, config.ledBrightness);
   btnEng.update();
   btnAbs.update();
+  btnTcr.update();
 
   // ENG encoder controls LED brightness;
   config.ledBrightness = ENG.read();
   if(btnEng.risingEdge()) {
-    Keyboard.println("LED brightness " + String(config.ledBrightness));
+    //Keyboard.println("LED brightness " + String(config.ledBrightness));
   }
 
   // ABS encoder controls encoder sensitivity
@@ -319,22 +321,27 @@ void configOp() {
   }
   if(btnAbs.risingEdge()) {
     //Keyboard.println("Encoder sensitivitz " + String(config.encSteps));
-    blink(PIN_LED_BLUE, config.encSteps, 200);
+    blinkLed(PIN_LED_BLUE, config.encSteps, 300);
   }
   
   // TCR encoder push toggles between joystick and keyboard mode
-  if( !digitalRead(PIN_BTN_TCR) ) {
-    config.joystickMode = !config.joystickMode;
-    if( config.joystickMode ) {
-      blink(PIN_LED_BLUE, 2, 500);
+  if( btnTcr.risingEdge() ) {
+    if( config.joystickMode != 0 ) {
+      config.joystickMode = false;
     } else {
-      blink(PIN_LED_RED, 2, 500);
+      config.joystickMode = true;
+    }
+    //config.joystickMode = !config.joystickMode;
+    if( config.joystickMode ) {
+      blinkLed(PIN_LED_BLUE, 2, 500);
+    } else {
+      blinkLed(PIN_LED_RED, 2, 500);
     }
   }
 }
 
 // Determine if config mode has to entered or not
-boolean checkConfigMode() {
+void checkConfigMode() {
   if( digitalRead(PIN_SW_IGN) ) {
     // Ignition switch must be off
     if( !digitalRead(PIN_BTN_ENG) && !digitalRead(PIN_BTN_ABS) ) {
@@ -342,11 +349,11 @@ boolean checkConfigMode() {
       TCR.write(0);
       ABS.write(config.encSteps);
       ENG.write(config.ledBrightness);
-      return true;
+      configMode = true;
     }
   } else if( configMode ) {
     // Toggling ignition switch leaves config mode.
-    EEPROM.update(CONFIG_ADDRESS, config);
+    EEPROM.put(CONFIG_ADDRESS, config);
     if( engMode ) {
       analogWrite(PIN_LED_RED, 0);
       analogWrite(PIN_LED_BLUE, config.ledBrightness);
@@ -354,10 +361,7 @@ boolean checkConfigMode() {
       analogWrite(PIN_LED_RED, config.ledBrightness);
       analogWrite(PIN_LED_BLUE, 0);
     }
-    return false;
-  } else {
-    // stay in config mode
-    return true;
+    configMode = false;
   }
 }
 
@@ -365,7 +369,7 @@ boolean checkConfigMode() {
 void loop() {
 
   // Determine if to enter config mode.
-  configMode = checkConfigMode();
+  checkConfigMode();
 
   if( configMode ) {
     configOp();
