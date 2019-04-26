@@ -7,7 +7,7 @@ The following functions are expected to be mapped on the steering wheel:
 * Brake bias settings
 * Any
 
-## [Starterbox](https://github.com/robbyb67/simracing/tree/master/starterbox)
+## [Starterbox](starterbox/README.md)
 
 This is a box providing
 
@@ -22,7 +22,7 @@ This is a box providing
 
 ## Future projects
 
-### [iRacing race control button box](https://github.com/robbyb67/simracing/tree/master/rccbox)
+### [iRacing race control button box](rccbox/README.md)
 
 Inspired by the [Simlogic box](https://www.simlogic-shop.com/home)
 
