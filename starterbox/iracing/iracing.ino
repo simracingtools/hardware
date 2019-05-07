@@ -42,8 +42,6 @@ Encoder TCR(PINS_ENC_TCR);
 // Encoder ENG has two functions depending this value;
 bool engMode, configMode;
 
-bool btnJoy[33];
-
 struct Config {
 	int encSteps;
 	int ledBrightness;
@@ -167,21 +165,15 @@ void handleSwitchJoy(Bounce* sw, int btn) {
   }
 }
 
+// Generate short single button press.
 void handleJoyButtonPress(int btn) {
   Joystick.button(btn, 1);
-  btnJoy[btn] = true;
+  delay(JOY_BTN_DURATION);
+  Joystick.button(btn, 0);
 }
 
-void handleJoystickRelease() {
-  int i;
-  for( i = 1; i < 33; i++ ) {
-    if( btnJoy[i] ) {
-      Joystick.button(i, 0);
-      btnJoy[i] = false;
-    }
-  }
-}
-
+// Check if current engine mode has to be changed and reflect changed 
+// setting on the LED's
 void checkEngMode() {
   if (btnEng.risingEdge()) {
     engMode = !engMode;
@@ -195,6 +187,7 @@ void checkEngMode() {
   }
 }
 
+// Update the button bounce objects
 void updateButtons() {
   swIgn.update();
   btnStart.update();
@@ -204,6 +197,7 @@ void updateButtons() {
   btnTcr.update();
 }
 
+// Called by the loop() function when in keyboard mode
 void normalOpKeyboard() {
   boolean tcrMode;
 
@@ -247,6 +241,7 @@ void normalOpKeyboard() {
   }
 }
 
+// Called by the loop() function when in joystick mode
 void normalOpJoystick() {
   boolean tcrMode;
 
@@ -291,6 +286,7 @@ void normalOpJoystick() {
   }
 }
 
+// Config mode helper function to let an led blink some times.
 void blinkLed(int pin, int times, int ms) {
   for( int i = 0; i < times; i++ ) {
     digitalWrite(pin, LOW);
@@ -300,6 +296,7 @@ void blinkLed(int pin, int times, int ms) {
   analogWrite(pin, config.ledBrightness);
 }
 
+// Called by the loop() function when in config mode
 void configOp() {
   // Light up both LED to signal config mode
   analogWrite(PIN_LED_RED, config.ledBrightness);

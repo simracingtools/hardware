@@ -4,7 +4,7 @@
 
 The idea came to me when I saw [this Panel on Amazon](https://www.amazon.de/dp/B01BV9CWW2/?coliid=ILLJIW41VWR2C&colid=2JV752ZE9GTFC&psc=0&ref_=lv_ov_lig_dp_it).
 
-Then I saw similar panel on [aliexpress.com](https://de.aliexpress.com/item/12V-20A-Carbon-Faser-Sim-Racing-Auto-Z-ndung-Schalter-Ersatz-Panel-Push-Start-anzeige-licht/32913185496.html) and ordered it and started to [build](https://github.com/robbyb67/simracing/tree/master/starterbox/Making.md)
+Then I saw similar panel on [aliexpress.com](https://de.aliexpress.com/item/12V-20A-Carbon-Faser-Sim-Racing-Auto-Z-ndung-Schalter-Ersatz-Panel-Push-Start-anzeige-licht/32913185496.html) and ordered it and started to [build](Making.md)
 
 ## Functions
 
@@ -12,6 +12,8 @@ Then I saw similar panel on [aliexpress.com](https://de.aliexpress.com/item/12V-
 
 The box can operate as a keyboard or joystick. I prefer the keyboard variant on iRacing but it depends on your
 desires and prefered racing simulation which mode fits best.
+
+[Short Reference](Reference.md)
 
 ### Ignition safety switch
 
@@ -75,7 +77,8 @@ In joystick mode the buttons 12 (-) and 13 (+) are used for fuel mix, 14 (-) and
 ### LED brightness, encoder sensitivity and operation mode
 
 LED brightness and encoder sensitivity are configurable. To enter configuration mode press ENG and ABS encoder while 
-ignition switch is off. Both LED light up to indicate configuration mode. 
+ignition switch is off. Both LED light up to indicate configuration mode and the red one blinks some times 
+according to the current encoder sensitivity setting.
 
 You can now set LED brightness with the ENG encoder. The LED brightness will change immediately.
 
