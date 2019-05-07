@@ -250,6 +250,7 @@ void normalOpKeyboard() {
 void normalOpJoystick() {
   boolean tcrMode;
 
+  handleJoystickRelease();
   // update the button objects
   updateButtons();
 
