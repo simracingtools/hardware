@@ -28,7 +28,7 @@ Inspired by the [Simlogic box](https://www.simlogic-shop.com/home)
 
 ![Simlogic Box](images/SimlogicBox.png)
 
-#### Planned Features:
+#### Planned Features
 
 ##### Stands section
 
@@ -60,8 +60,7 @@ Inspired by the [Simlogic box](https://www.simlogic-shop.com/home)
 * add. black box selection buttons
 * 2 way switch to shift driving view up/down
 
-### SLIManager Teensy lights panel
+### [Race display](v2rController/README.md)
 
-Some LED work: [V2R controller](http://www.eksimracing.com/help/getting-started-with-eksimracing-vtor-controller/)
-
-
+Some LED work [V2R controller](http://www.eksimracing.com/help/getting-started-with-eksimracing-vtor-controller/) in conjunction with
+an LCD display as additional Windows display.
