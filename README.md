@@ -20,6 +20,13 @@ This is a box providing
 * Rotary encoder for ENGine fuel mix/throttle shaping w. push function to switch between functions
 * LED to indicate selected engine setting (fuel mix or throttle shaping)
 
+### [Race display](v2rController/README.md)
+
+Some LED work [V2R controller](http://www.eksimracing.com/help/getting-started-with-eksimracing-vtor-controller/) in conjunction with
+an LCD display as additional Windows display.
+
+The functionality is similar to [SIM Race LCD](http://www.simdisplay.net/sim-race-lcd-v3)
+
 ## Future projects
 
 ### [iRacing race control button box](rccbox/README.md)
@@ -59,8 +66,3 @@ Inspired by the [Simlogic box](https://www.simlogic-shop.com/home)
 * Button to select in car black box
 * add. black box selection buttons
 * 2 way switch to shift driving view up/down
-
-### [Race display](v2rController/README.md)
-
-Some LED work [V2R controller](http://www.eksimracing.com/help/getting-started-with-eksimracing-vtor-controller/) in conjunction with
-an LCD display as additional Windows display.
