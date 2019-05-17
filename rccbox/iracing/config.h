@@ -66,14 +66,15 @@ int relayPins[] = {PIN_R1, PIN_R2, PIN_R3, PIN_R4, PIN_R5, PIN_R6, PIN_R7, PIN_R
 #define PIN_BTN_BBPIT       10   // InPit BB
 #define PIN_BTN_BBFUEL      11   // Fuel BB
 #define PIN_BTN_BBTYRE      12   // Tyre BB
-#define PIN_LED_13          13   // LED PIN
+#define PIN_LED_T_RL        13   // Tyre Rear/Left LED
 #define PIN_BTN_BBPREL      24   // PosRel BB
 #define PIN_BTN_BBPABS      25   // PosAbs BB
 #define PIN_BTN_BBLAP       26   // Lap BB
-#define PIN_SW_O_R          27   // Switch oval/road
+#define PIN_LED_FUEL        30   // Refuel LED
 #define PINS_ENC_FUEL    29,28   // Fuel encoder pins
-#define PIN_BTN_FUEL        30   // Fuel enc push
-#define PIN_LED_PWM         35   // LED PIN
+#define PIN_BTN_FUEL        27   // Fuel enc push
+#define PIN_SW_O_R          32   // Switch oval/road
+#define PIN_LED_T_FR        35   // Tyre Front/Right LED
 #define PIN_BTN_BB1         36   // BlackBox1 push
 #define PIN_BTN_BB2         37   // BlackBox2 push
 #define PINS_ENC_BB1     14,15   // BlackBox1 encoder pins

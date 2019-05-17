@@ -75,9 +75,11 @@ void handleJoyButtonPress(int btn) {
 void handleButtonJoy(Bounce* btn, int bntNum) {
   if(btn->fallingEdge()) {
     Joystick.button(bntNum, 1);
+//    Keyboard.print(String(bntNum) + "-1");
   }
   if(btn->risingEdge()) {
     Joystick.button(bntNum, 0);
+//    Keyboard.print(String(bntNum) + "-0");
   }
 }
 
@@ -149,15 +151,15 @@ void handleTyreButtons() {
      changeTyreR = 1;
     }
   }
-  if( changeTyreR ) {
-    analogWrite(PIN_LED_PWM, config.ledBrightness);
-  } else {
-    analogWrite(PIN_LED_PWM, 0);
-  }
   if( changeTyreF ) {
-    digitalWrite(PIN_LED_13, HIGH);
+    analogWrite(PIN_LED_T_FR, config.ledBrightness);
   } else {
-    digitalWrite(PIN_LED_13, LOW);
+    analogWrite(PIN_LED_T_FR, 0);
+  }
+  if( changeTyreR ) {
+    digitalWrite(PIN_LED_T_RL, HIGH);
+  } else {
+    digitalWrite(PIN_LED_T_RL, LOW);
   }
 }
 
@@ -180,6 +182,12 @@ void handleFuel() {
     amountFuel = 0;
   }
   handleEncoderFuel(&fuelEnc);
+  
+  if( amountFuel != 0 ) {
+    analogWrite(PIN_LED_FUEL, config.ledBrightness);
+  } else {
+    analogWrite(PIN_LED_FUEL, 0);
+  }
 }
 
 // Update the button bounce objects
@@ -233,8 +241,9 @@ void setup() {
   pinMode(PIN_SW_VIEW_UP, INPUT_PULLUP);
   pinMode(PIN_SW_O_R, INPUT_PULLUP);
 
-  pinMode(PIN_LED_13, OUTPUT);
-  pinMode(PIN_LED_PWM, OUTPUT);
+  pinMode(PIN_LED_T_FR, OUTPUT);
+  pinMode(PIN_LED_T_RL, OUTPUT);
+  pinMode(PIN_LED_FUEL, OUTPUT);
 
   for( int i = 0; i < 8; i++ ) {
     pinMode(relayPins[i], OUTPUT);
@@ -246,6 +255,8 @@ void setup() {
   ra1Enc.write(0);
   ra2Enc.write(0);
   fuelEnc.write(0);
+
+  Joystick.useManualSend(false);
 }
 
 void normalOpJoystick() {
@@ -254,8 +265,6 @@ void normalOpJoystick() {
   // faster than the buttons could be pressed and released.
   updateButtons();
 
-  handleButtonKey(&btnExit, KEY_EXIT);
-  
   handleEncoderJoy(&bb1Enc, JOY_BTN_BB1_INC, JOY_BTN_BB1_DEC);
   handleEncoderJoy(&bb2Enc, JOY_BTN_BB2_INC, JOY_BTN_BB2_DEC);
   handleEncoderJoy(&ra1Enc, JOY_BTN_RA1_INC, JOY_BTN_RA1_DEC);
@@ -277,6 +286,8 @@ void normalOpJoystick() {
 
   handleTyreButtons();
   handleFuel();
+
+  handleButtonKey(&btnExit, KEY_EXIT);
 }
 
 
