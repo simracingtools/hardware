@@ -118,37 +118,50 @@ void handleEncoderJoy(Encoder* enc, int up, int down) {
   }
 }
 
+void sendMacro(String macro) {
+  Keyboard.print("#");
+  Keyboard.print(macro);
+  Keyboard.print("$");
+}
+
 void handleButtonMacro(Bounce*  btn, String macro) {
   if(btn->risingEdge()) {
-    Keyboard.println(macro);
+    sendMacro(macro);
   }
 }
 
 void handleTyreButtons() {
-
+  if(btnClearTy.fallingEdge()) {
+    Joystick.button(JOY_BTN_TY_CLEAR, 1);
+  }
   if(btnClearTy.risingEdge()) {
-    Keyboard.println(TXT_CLEAR_TYRES);
+    Joystick.button(JOY_BTN_TY_CLEAR, 0);
+//    sendMacro(TXT_CLEAR_TYRES);
     changeTyreF = 0;
     changeTyreR = 0;
   }
 
   if( digitalRead(PIN_SW_O_R) ) {
     if(swTyreUp.risingEdge()) {
-      Keyboard.println(TXT_TYRES_RIGHT);
-     changeTyreF = 1;
+      handleJoyButtonPress(JOY_BTN_TY_RIGHT);
+//      sendMacro(TXT_TYRES_RIGHT);
+      changeTyreF = 1;
     }
     if(swTyreDn.risingEdge()) {
-      Keyboard.println(TXT_TYRES_LEFT);
-     changeTyreR = 1;
+      handleJoyButtonPress(JOY_BTN_TY_LEFT);
+//      sendMacro(TXT_TYRES_LEFT);
+      changeTyreR = 1;
     }
   } else {
     if(swTyreUp.risingEdge()) {
-      Keyboard.println(TXT_TYRES_FRONT);
-     changeTyreF = 1;
+      handleJoyButtonPress(JOY_BTN_TY_FRONT);
+//      sendMacro(TXT_TYRES_FRONT);
+      changeTyreF = 1;
     }
     if(swTyreDn.risingEdge()) {
-      Keyboard.println(TXT_TYRES_REAR);
-     changeTyreR = 1;
+      handleJoyButtonPress(JOY_BTN_TY_REAR);
+//      sendMacro(TXT_TYRES_REAR);
+      changeTyreR = 1;
     }
   }
   if( changeTyreF ) {
@@ -167,18 +180,22 @@ void handleEncoderFuel(Encoder* enc) {
   long encVal = enc->read();
   if(encVal < (-1 * config.encSteps)) {
     amountFuel --;
-    Keyboard.println(TXT_FUEL + String(amountFuel));
+//    sendMacro(TXT_FUEL + String(amountFuel));
+    handleJoyButtonPress(JOY_BTN_FUEL_DEC);
+
     enc->write(0);
   } else if( encVal > config.encSteps ) {
     amountFuel ++;
-    Keyboard.println(TXT_FUEL + String(amountFuel));
+//    sendMacro(TXT_FUEL + String(amountFuel));
+    handleJoyButtonPress(JOY_BTN_FUEL_INC);
     enc->write(0);
   }
 }
 
 void handleFuel() {
   if(btnFuel.risingEdge()) {
-    Keyboard.println(TXT_CLEAR_FUEL);
+//    sendMacro(TXT_CLEAR_FUEL);
+    handleJoyButtonPress(JOY_BTN_FUEL_CLEAR);
     amountFuel = 0;
   }
   handleEncoderFuel(&fuelEnc);
@@ -215,6 +232,8 @@ void updateButtons() {
 }
 
 void setup() {
+  Serial.begin(9600); // USB is always 12 Mbit/sec
+
   if( config.encSteps == 0 ) {
     config.encSteps = ENC_STEPS;
     config.ledBrightness = LED_BRIGHTNESS;

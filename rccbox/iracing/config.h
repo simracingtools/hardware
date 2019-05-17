@@ -35,14 +35,23 @@
 #define JOY_BTN_VIEW_UP     20
 #define JOY_BTN_VIEW_DN     21
 
+#define JOY_BTN_TY_FRONT    22
+#define JOY_BTN_TY_REAR     23
+#define JOY_BTN_TY_RIGHT    24
+#define JOY_BTN_TY_LEFT     25
+#define JOY_BTN_TY_CLEAR    26
+#define JOY_BTN_FUEL_CLEAR  27
+#define JOY_BTN_FUEL_INC    28
+#define JOY_BTN_FUEL_DEC    29
+
 // Macro definitions
-#define TXT_FUEL            "#fuel "
-#define TXT_CLEAR_TYRES     "#cleartires"
-#define TXT_CLEAR_FUEL      "#clear fuel"
-#define TXT_TYRES_FRONT     "#rf lf"
-#define TXT_TYRES_REAR      "#rr lr"
-#define TXT_TYRES_LEFT      "#lf lr"
-#define TXT_TYRES_RIGHT     "#rf rr"
+#define TXT_FUEL            "fuel "
+#define TXT_CLEAR_TYRES     "cleartires"
+#define TXT_CLEAR_FUEL      "clear fuel"
+#define TXT_TYRES_FRONT     "rf lf"
+#define TXT_TYRES_REAR      "rr lr"
+#define TXT_TYRES_LEFT      "lf lr"
+#define TXT_TYRES_RIGHT     "rf rr"
 
 // Pin assignment definitions
 #define PIN_R1              16   // Relay 1
