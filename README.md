@@ -5,7 +5,9 @@ Simracing addons: Buttonboxes and Displays
 The following functions are expected to be mapped on the steering wheel:
 
 * Brake bias settings
-* Any
+* KERS / Hybrid system controls
+* Any push to talk buttons
+* Dashboard next/prev buttons
 
 ## [Starterbox](starterbox/README.md)
 
@@ -35,34 +37,32 @@ Inspired by the [Simlogic box](https://www.simlogic-shop.com/home)
 
 ![Simlogic Box](images/SimlogicBox.png)
 
-#### Planned Features
+#### Features
 
 ##### Stands section
 
-* Announce pitstop button
 * Clear tires button
 * Switch to select between read / oval
 * 2 way rocker switch to select left (rear) / right (front) tires depending on road/oval selection
 * Rotary encoder to select fuel refill w. push function to clear fuel
 
-##### Race section
+##### Black box (UI) section
 
-* Button to select absolute position black box
-* Button to select relative position black box
 * Button to select lap timing black box
+* Button to select relative position black box
+* Button to select radio black box
+* Button to select fuel black box
+* Button to select tire black box
+* Button to select in car adjustments black box
+* Button to select pit adjustments black box
+* Rotary encoder to select black box value
+* Rotary encoder to increase/decrease selected black box value w. push function for value toggle
 
 ##### Radio section
 
 * Rotary encoder for voice chat volume w. push function to mute voice chat
-* Mute driver button
-* Rotary encoder for radio channel select w. push to display radio black box
+* Rotary encoder for radio channel select w. push to mute driver
 
-##### Black box (UI) section
-
-* Rotary encoder to select black box value
-* Rotary encoder to increase/decrease selected black box value w. push function for value toggle
-* Button to select fuel black box
-* Button to select tire black box
-* Button to select in car black box
-* add. black box selection buttons
+##### Sim section
 * 2 way switch to shift driving view up/down
+* Exit button to leave simulation
