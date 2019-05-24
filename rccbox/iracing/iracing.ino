@@ -61,7 +61,19 @@ struct Config {
   bool joystickMode;
 }; 
 
+struct PitSvFlags {
+    byte lf_tire_change;
+    byte rf_tire_change;
+    byte lr_tire_change;
+    byte rr_tire_change;
+    byte fuel_fill;
+    byte windshield_tearoff;
+    byte fast_repair;
+};
+    
 Config config = { ENC_STEPS, LED_BRIGHTNESS, JOYSTICK_MODE};
+PitSvFlags pitFlags = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40};
+
 int rActive = -1;
 int amountFuel = 0;
 int changeTyreR, changeTyreF = 0;
@@ -164,16 +176,6 @@ void handleTyreButtons() {
       changeTyreR = 1;
     }
   }
-  if( changeTyreF ) {
-    analogWrite(PIN_LED_T_FR, config.ledBrightness);
-  } else {
-    analogWrite(PIN_LED_T_FR, 0);
-  }
-  if( changeTyreR ) {
-    digitalWrite(PIN_LED_T_RL, HIGH);
-  } else {
-    digitalWrite(PIN_LED_T_RL, LOW);
-  }
 }
 
 void handleEncoderFuel(Encoder* enc) {
@@ -200,11 +202,6 @@ void handleFuel() {
   }
   handleEncoderFuel(&fuelEnc);
   
-  if( amountFuel != 0 ) {
-    analogWrite(PIN_LED_FUEL, config.ledBrightness);
-  } else {
-    analogWrite(PIN_LED_FUEL, 0);
-  }
 }
 
 // Update the button bounce objects
@@ -309,9 +306,102 @@ void normalOpJoystick() {
   handleButtonKey(&btnExit, KEY_EXIT);
 }
 
+String readSerial() {
+  char buff[10];
+  int dataCount = 0;
+  boolean startData = false;
+  while(Serial.available()) {
+    char c = Serial.read();
+    if( c == '#' ) {
+      startData = true;
+    } else if( startData && dataCount < 10) {
+      if( c != '*') {
+        buff[dataCount++] = c;
+      } else {  
+        break;
+      }
+    } else if(dataCount >= 10) {
+      return String();
+    }
+  }
+  if( startData || dataCount > 0 ) {
+    return String(buff);
+  }
+  return String();
+}
+
+void processFlags(int flags) {
+  if( digitalRead(PIN_SW_O_R) ) {
+    if(flags & pitFlags.rf_tire_change || flags & pitFlags.rr_tire_change) {
+      changeTyreF = 1;
+    } else {
+      changeTyreF = 0;
+    }
+    if(flags & pitFlags.lf_tire_change || flags & pitFlags.lr_tire_change) {
+      changeTyreR = 1;
+    } else {
+      changeTyreR = 0;
+    }
+  } else {
+    if(flags & pitFlags.rf_tire_change || flags & pitFlags.lf_tire_change) {
+      changeTyreF = 1;
+    } else {
+      changeTyreF = 0;
+    }
+    if(flags & pitFlags.lr_tire_change || flags & pitFlags.rr_tire_change) {
+      changeTyreR = 1;
+    } else {
+      changeTyreR = 0;
+    }
+  }
+  if( flags & pitFlags.fuel_fill ) {
+    amountFuel = 1;
+  } else {
+    amountFuel = 0;
+  }
+}
+
+void processFuel(float fuel) {
+  amountFuel = int(fuel);
+}
+
+void processTelegram(String* telegram) {
+  int idx = telegram->indexOf('=');
+  if( idx > 0 ) {
+    String key = telegram->substring(0, idx);
+    String val = telegram->substring(idx+1);
+    if( key.equals("PFL") ){
+      processFlags(val.toInt());
+    } else if( key.equals("PFU") ) {
+      processFuel(val.toFloat());
+    }
+  }
+}
 
 void loop() {
   normalOpJoystick();
+
+  String telegram = readSerial();
+  if(telegram.length() > 0) {
+    processTelegram(&telegram);
+  }
+
+  if( changeTyreF ) {
+    analogWrite(PIN_LED_T_FR, config.ledBrightness);
+  } else {
+    analogWrite(PIN_LED_T_FR, 0);
+  }
+  if( changeTyreR ) {
+    digitalWrite(PIN_LED_T_RL, HIGH);
+  } else {
+    digitalWrite(PIN_LED_T_RL, LOW);
+  }
+
+  if( amountFuel != 0 ) {
+    analogWrite(PIN_LED_FUEL, config.ledBrightness);
+  } else {
+    analogWrite(PIN_LED_FUEL, 0);
+  }
 
   delay(LOOP_DELAY);
 }
