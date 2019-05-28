@@ -29,7 +29,14 @@ an LCD display as additional Windows display.
 
 The functionality is similar to [SIM Race LCD](http://www.simdisplay.net/sim-race-lcd-v3)
 
-## Future projects
+### [ir2mqtt](ir2mqtt/README.md)
+
+An application for two purposes:
+
+* Integrate with smart home systems/components which have support for the MQTT 
+protocol (e.g. [openHAB](https://www.openhab.org/docs/)
+* Send pit service flags and pit service fuel information to a button box using
+serial communication 
 
 ### [iRacing race control button box](rccbox/README.md)
 
@@ -37,7 +44,7 @@ Inspired by the [Simlogic box](https://www.simlogic-shop.com/home)
 
 ![Simlogic Box](images/SimlogicBox.png)
 
-#### Features
+this box provides the following features:
 
 ##### Stands section
 
@@ -45,6 +52,7 @@ Inspired by the [Simlogic box](https://www.simlogic-shop.com/home)
 * Switch to select between read / oval
 * 2 way rocker switch to select left (rear) / right (front) tires depending on road/oval selection
 * Rotary encoder to select fuel refill w. push function to clear fuel
+* LED to indicate selected tyre change and refueling in pit (optionally synchronized with simulation by [ir2mqtt](ir2mqtt/README.md) 
 
 ##### Black box (UI) section
 
