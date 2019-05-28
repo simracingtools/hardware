@@ -70,13 +70,29 @@ struct PitSvFlags {
     byte windshield_tearoff;
     byte fast_repair;
 };
-    
+
+struct PitCommand {
+    clear;       // Clear all pit checkboxes
+    ws;          // Clean the winshield, using one tear off
+    fuel;        // Add fuel, optionally specify the amount to add in liters or pass '0' to use existing amount
+    lf;          // Change the left front tire, optionally specifying the pressure in KPa or pass '0' to use existing pressure
+    rf;          // right front
+    lr;          // left rear
+    rr;          // right rear
+    clear_tires; // Clear tire pit checkboxes
+    fr;          // Request a fast repair
+    clear_ws;    // Uncheck Clean the winshield checkbox
+    clear_fr;    // Uncheck request a fast repair
+    clear_fuel;  // Uncheck add fuel
+}
+
 Config config = { ENC_STEPS, LED_BRIGHTNESS, JOYSTICK_MODE};
 PitSvFlags pitFlags = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40};
+PitCommand pitCmd = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
 int rActive = -1;
 int amountFuel = 0;
-int changeTyreR, changeTyreF = 0;
+int changeTyreR, changeTyreF, doRefill = 0;
 
 void handleJoyButtonPress(int btn) {
   Joystick.button(btn, 1);
@@ -131,9 +147,11 @@ void handleEncoderJoy(Encoder* enc, int up, int down) {
 }
 
 void sendMacro(String macro) {
-  Keyboard.print("#");
-  Keyboard.print(macro);
-  Keyboard.print("$");
+  Serial.print("#" + macro + "*\n");
+}
+
+void sendPitCmd(int cmd) {
+  sendMacro(TXT_PCM_TELEGRAM + "=" + String(cmd);
 }
 
 void handleButtonMacro(Bounce*  btn, String macro) {
@@ -148,7 +166,7 @@ void handleTyreButtons() {
   }
   if(btnClearTy.risingEdge()) {
     Joystick.button(JOY_BTN_TY_CLEAR, 0);
-//    sendMacro(TXT_CLEAR_TYRES);
+    sendPitCmd(pitCmd.clear_tires); 
     changeTyreF = 0;
     changeTyreR = 0;
   }
@@ -156,23 +174,27 @@ void handleTyreButtons() {
   if( digitalRead(PIN_SW_O_R) ) {
     if(swTyreUp.risingEdge()) {
       handleJoyButtonPress(JOY_BTN_TY_RIGHT);
-//      sendMacro(TXT_TYRES_RIGHT);
+      sendPitCmd(pitCmd.rf); 
+      sendPitCmd(pitCmd.rr); 
       changeTyreF = 1;
     }
     if(swTyreDn.risingEdge()) {
       handleJoyButtonPress(JOY_BTN_TY_LEFT);
-//      sendMacro(TXT_TYRES_LEFT);
+      sendPitCmd(pitCmd.lf); 
+      sendPitCmd(pitCmd.lr); 
       changeTyreR = 1;
     }
   } else {
     if(swTyreUp.risingEdge()) {
       handleJoyButtonPress(JOY_BTN_TY_FRONT);
-//      sendMacro(TXT_TYRES_FRONT);
+      sendPitCmd(pitCmd.rf); 
+      sendPitCmd(pitCmd.lf); 
       changeTyreF = 1;
     }
     if(swTyreDn.risingEdge()) {
       handleJoyButtonPress(JOY_BTN_TY_REAR);
-//      sendMacro(TXT_TYRES_REAR);
+      sendPitCmd(pitCmd.rr); 
+      sendPitCmd(pitCmd.lr); 
       changeTyreR = 1;
     }
   }
@@ -182,13 +204,14 @@ void handleEncoderFuel(Encoder* enc) {
   long encVal = enc->read();
   if(encVal < (-1 * config.encSteps)) {
     amountFuel --;
-//    sendMacro(TXT_FUEL + String(amountFuel));
+    doRefill = 1; 
+    sendMacro(TXT_PFU_TELEGRAM + String(amountFuel));
     handleJoyButtonPress(JOY_BTN_FUEL_DEC);
-
     enc->write(0);
   } else if( encVal > config.encSteps ) {
     amountFuel ++;
-//    sendMacro(TXT_FUEL + String(amountFuel));
+    doRefill = 1; 
+    sendMacro(TXT_PFU_TELEGRAM + String(amountFuel));
     handleJoyButtonPress(JOY_BTN_FUEL_INC);
     enc->write(0);
   }
@@ -196,9 +219,9 @@ void handleEncoderFuel(Encoder* enc) {
 
 void handleFuel() {
   if(btnFuel.risingEdge()) {
-//    sendMacro(TXT_CLEAR_FUEL);
+    doRefill = 0; 
     handleJoyButtonPress(JOY_BTN_FUEL_CLEAR);
-    amountFuel = 0;
+    sendPitCommand(pitCmd.clear_fuel);
   }
   handleEncoderFuel(&fuelEnc);
   
@@ -331,6 +354,7 @@ String readSerial() {
 }
 
 void processFlags(int flags) {
+  currentPitFlags = flags;
   if( digitalRead(PIN_SW_O_R) ) {
     if(flags & pitFlags.rf_tire_change || flags & pitFlags.rr_tire_change) {
       changeTyreF = 1;
@@ -355,9 +379,9 @@ void processFlags(int flags) {
     }
   }
   if( flags & pitFlags.fuel_fill ) {
-    amountFuel = 1;
+    doRefill = 1;
   } else {
-    amountFuel = 0;
+    doRefill = 0;
   }
 }
 
@@ -378,14 +402,7 @@ void processTelegram(String* telegram) {
   }
 }
 
-void loop() {
-  normalOpJoystick();
-
-  String telegram = readSerial();
-  if(telegram.length() > 0) {
-    processTelegram(&telegram);
-  }
-
+void setLED() {
   if( changeTyreF ) {
     analogWrite(PIN_LED_T_FR, config.ledBrightness);
   } else {
@@ -397,11 +414,22 @@ void loop() {
     digitalWrite(PIN_LED_T_RL, LOW);
   }
 
-  if( amountFuel != 0 ) {
+  if( doRefill != 0 ) {
     analogWrite(PIN_LED_FUEL, config.ledBrightness);
   } else {
     analogWrite(PIN_LED_FUEL, 0);
   }
+}
 
+void loop() {
+  normalOpJoystick();
+
+  String telegram = readSerial();
+  if(telegram.length() > 0) {
+    processTelegram(&telegram);
+  }
+
+  setLED();
+  
   delay(LOOP_DELAY);
 }
