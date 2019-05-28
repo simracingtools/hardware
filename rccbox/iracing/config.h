@@ -52,6 +52,8 @@
 #define TXT_TYRES_REAR      "rr lr"
 #define TXT_TYRES_LEFT      "lf lr"
 #define TXT_TYRES_RIGHT     "rf rr"
+#define TXT_PFU_TELEGRAM    "PFU="
+#define TXT_PCM_TELEGRAM    "PCM="
 
 // Pin assignment definitions
 #define PIN_R1              16   // Relay 1

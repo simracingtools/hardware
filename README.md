@@ -21,6 +21,7 @@ This is a box providing
 * Rotary encoder for ABS setting w. push function ABS Toggle (for GT cars)
 * Rotary encoder for ENGine fuel mix/throttle shaping w. push function to switch between functions
 * LED to indicate selected engine setting (fuel mix or throttle shaping)
+* Optional bidirectional serial communication with the simulation (see ir2mqtt)
 
 ### [Race display](v2rController/README.md)
 
