@@ -72,19 +72,19 @@ struct PitSvFlags {
 };
 
 struct PitCommand {
-    clear;       // Clear all pit checkboxes
-    ws;          // Clean the winshield, using one tear off
-    fuel;        // Add fuel, optionally specify the amount to add in liters or pass '0' to use existing amount
-    lf;          // Change the left front tire, optionally specifying the pressure in KPa or pass '0' to use existing pressure
-    rf;          // right front
-    lr;          // left rear
-    rr;          // right rear
-    clear_tires; // Clear tire pit checkboxes
-    fr;          // Request a fast repair
-    clear_ws;    // Uncheck Clean the winshield checkbox
-    clear_fr;    // Uncheck request a fast repair
-    clear_fuel;  // Uncheck add fuel
-}
+    int clear;       // Clear all pit checkboxes
+    int ws;          // Clean the winshield, using one tear off
+    int fuel;        // Add fuel, optionally specify the amount to add in liters or pass '0' to use existing amount
+    int lf;          // Change the left front tire, optionally specifying the pressure in KPa or pass '0' to use existing pressure
+    int rf;          // right front
+    int lr;          // left rear
+    int rr;          // right rear
+    int clear_tires; // Clear tire pit checkboxes
+    int fr;          // Request a fast repair
+    int clear_ws;    // Uncheck Clean the winshield checkbox
+    int clear_fr;    // Uncheck request a fast repair
+    int clear_fuel;  // Uncheck add fuel
+};
 
 Config config = { ENC_STEPS, LED_BRIGHTNESS, JOYSTICK_MODE};
 PitSvFlags pitFlags = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40};
@@ -151,7 +151,7 @@ void sendMacro(String macro) {
 }
 
 void sendPitCmd(int cmd) {
-  sendMacro(TXT_PCM_TELEGRAM + "=" + String(cmd);
+  sendMacro(String(TXT_PCM_TELEGRAM) + String(cmd));
 }
 
 void handleButtonMacro(Bounce*  btn, String macro) {
@@ -221,7 +221,7 @@ void handleFuel() {
   if(btnFuel.risingEdge()) {
     doRefill = 0; 
     handleJoyButtonPress(JOY_BTN_FUEL_CLEAR);
-    sendPitCommand(pitCmd.clear_fuel);
+    sendPitCmd(pitCmd.clear_fuel);
   }
   handleEncoderFuel(&fuelEnc);
   
@@ -354,7 +354,6 @@ String readSerial() {
 }
 
 void processFlags(int flags) {
-  currentPitFlags = flags;
   if( digitalRead(PIN_SW_O_R) ) {
     if(flags & pitFlags.rf_tire_change || flags & pitFlags.rr_tire_change) {
       changeTyreF = 1;
