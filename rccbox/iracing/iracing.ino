@@ -1,7 +1,7 @@
 /* 
-    Starterbox for iRacing motorsport simulation.
-    You must select Keyboard from the "Tools > USB Type" menu
-    This code is based on Teensyduino public domain example code.
+    Race control box for iRacing motorsport simulation.
+    You must select Keyboard + Joystick + Serial from the "Tools > USB Type" 
+    menu.
     Copyright (C) 2019  Robert Bausdorf
 
     This program is free software: you can redistribute it and/or modify
