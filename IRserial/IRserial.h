@@ -52,7 +52,12 @@ struct IRpitSvFlags {
 
 extern IRpitSvFlags irPitFlags;
 
-extern const char* const irTelegramNames[];
+struct ITtelegramNames {
+	const char* const PFU;
+	const char* const PFL;
+};
+
+extern IRtelegramNames irTelegramNames;
 
 class IRtelegram {
 	public:

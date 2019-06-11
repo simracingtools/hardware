@@ -13,11 +13,11 @@ void setup(void) {
 void loop(void) {
   IRtelegram* telegram = irSerial.receiveTelegram();
   if( telegram->isValid() ) {
-    if( telegram->isOfType("PFU") ) {
+    if( telegram->isOfType(irTelegramNames.PFU) ) {
       lcd1.setCursor(0, 0);
       lcd1.print("Refuel: " + String(telegram->toFloatValue()) + " L");
     }
-    if( telegram->isOfType("PFL") ) {
+    if( telegram->isOfType(irTelegramNames.PFL) ) {
       lcd1.setCursor(0,1);
       lcd1.print("                ");
       

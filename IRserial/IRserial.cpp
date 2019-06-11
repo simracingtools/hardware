@@ -22,7 +22,7 @@
 IRpitCommand irPitCmd = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 IRpitSvFlags irPitFlags = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40 };
 
-const char* const irTelegramNames[] = { "PFU", "PFL", "PCM" };
+IRtelegramNames irTelegramNames = { "PFU", "PFL" };
 
 IRtelegram::IRtelegram(const char* type, const char* value) {
 	_type = type;
