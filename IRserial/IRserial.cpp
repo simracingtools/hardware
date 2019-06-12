@@ -102,7 +102,7 @@ const char* IRserial::readTelegram() {
 		char c = _port->read();
 		if (c == '#') {
 			startdata = true;
-		} else if (startdata && datacount < 10) {
+		} else if (startdata && datacount < 50) {
 			if (c != '*') {
 				_buff[datacount++] = c;
 			} else {
