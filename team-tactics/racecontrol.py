@@ -53,26 +53,26 @@ class State:
     subSessionId = -1
     sessionNum = -1
 
-    def fromDict(self, dict):
-        self.lap = dict['Lap']
-        self.tick = dict['Tick']
-        self.eventCount = dict['EventCount']
+    def fromDict(self, dic):
+        self.lap = dic['Lap']
+        self.tick = dic['Tick']
+        self.eventCount = dic['EventCount']
 
     def toDict(self):
-        dict = {}
-        dict['Lap'] = self.lap
-        dict['Tick'] = self.tick
-        dict['EventCount'] = self.eventCount
-        return dict
+        dic = {}
+        dic['Lap'] = self.lap
+        dic['Tick'] = self.tick
+        dic['EventCount'] = self.eventCount
+        return dic
 
 class Field:
     teams = []
 
     def toDict(self):
-        dict = {}
-        dict['Teams'] = self.teams
+        dic = {}
+        dic['Teams'] = self.teams
         
-        return dict
+        return dic
 
 # here we check if we are connected to iracing
 # so we can retrieve some data
@@ -147,11 +147,12 @@ def checkSessionChange():
     if sessionChange:
         print('SessionId  : ' + getCollectionName())
 
-def generateEvent(driver):
+def generateEvent(driver, driverIdx):
     trackEvent = {}
     state.eventCount += 1
     trackEvent['IncNo'] = state.eventCount
     trackEvent['CurrentDriver'] = driver['UserName']
+    trackEvent['IRating'] = driver['IRating']
     trackEvent['TeamName'] = driver['TeamName']
     trackEvent['CarNumber'] = driver['CarNumberRaw']
     trackEvent['Lap'] = ir['CarIdxLap'][driverIdx]
@@ -216,7 +217,7 @@ def loop():
 
             if field.teams[driverIdx]['currentDriver'] != driver['UserName']: 
             #and dict['trackLoc'] == 3:
-                trackEvent = generateEvent(driver)
+                trackEvent = generateEvent(driver, driverIdx)
                 trackEvent['Type'] = 'DriverChange'
 
                 field.teams[driverIdx]['currentDriver'] = driver['UserName']
@@ -229,7 +230,7 @@ def loop():
                     print('Unable to write event document: ' + str(ex))
 
             if field.teams[driverIdx]['onPitRoad'] != dict['onPitRoad']:
-                trackEvent = generateEvent(driver)
+                trackEvent = generateEvent(driver, driverIdx)
                 if dict['onPitRoad']:
                     trackEvent['Type'] = 'PitEnter'
                 else:
@@ -245,7 +246,7 @@ def loop():
                     print('Unable to write event document: ' + str(ex))
 
             if field.teams[driverIdx]['trackLoc'] != dict['trackLoc']:
-                trackEvent = generateEvent(driver)
+                trackEvent = generateEvent(driver, driverIdx)
                 #irsdk_NotInWorld       -1
                 #irsdk_OffTrack          0
                 #irsdk_InPitStall        1
@@ -253,21 +254,24 @@ def loop():
                 #irsdk_OnTrack           3
                 if dict['trackLoc'] == -1:
                     trackEvent['Type'] = 'OffWorld'
-                elif dict['trackLoc'] == 0:
+                if dict['trackLoc'] == 0:
                     trackEvent['Type'] = 'OffTrack'
                 elif dict['trackLoc'] == 1:
                     trackEvent['Type'] = 'InPitStall'
                 elif dict['trackLoc'] == 2:
                     trackEvent['Type'] = 'AproachingPits'
-                elif dict['trackLoc'] == 3:
+                elif dict['trackLoc'] == 3 and field.teams[driverIdx]['trackLoc'] != -1:
                     trackEvent['Type'] = 'OnTrack'
+                else:
+                    trackEvent['Type'] = 'None'
 
                 field.teams[driverIdx]['trackLoc'] = dict['trackLoc']
-                print(json.dumps(trackEvent))
-                try:
-                    col_ref.document(str(state.eventCount)).set(trackEvent)
-                except Exception as ex:
-                    print('Unable to write event document: ' + str(ex))
+                if dict['trackLoc'] != -1 and trackEvent['Type'] != 'None':
+                    print(json.dumps(trackEvent))
+                    try:
+                        col_ref.document(str(state.eventCount)).set(trackEvent)
+                    except Exception as ex:
+                        print('Unable to write event document: ' + str(ex))
 
         else:
             field.teams[driverIdx] = dict
