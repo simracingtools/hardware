@@ -28,7 +28,7 @@ __email__ =  "rbausdorf@gmail.com"
 __license__ = "GPLv3"
 #__maintainer__ = "developer"
 __status__ = "Production"
-__version__ = "1.4"
+__version__ = "1.5"
 
 import irsdk
 import time
@@ -129,6 +129,9 @@ def publishSessionTime():
     
     # Get the simulated time of day from IRSDK
     sToD = ir['SessionTimeOfDay']
+    if sToD < 3600:
+        return
+
     tod = time.localtime(float(sToD)-3600)
     dat = ir['WeekendInfo']['WeekendOptions']['Date'].split('-')
 
