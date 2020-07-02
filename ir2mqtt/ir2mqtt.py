@@ -36,7 +36,7 @@ import paho.mqtt.client as mqtt
 import configparser
 import yaml
 import serial
-import astral
+from astral import sun
 import timezonefinder
 import pytz
 from datetime import datetime
@@ -151,12 +151,12 @@ def publishLightInfo(dateAndTime):
         print("Could not determine the time zone")
     else:
         # Calculate solar elevation and twilight start and end times
-        angle = geoTime.solar_elevation(dateAndTime, state.latitude, state.longitude)
+        angle = sun.solar_elevation(dateAndTime, state.latitude, state.longitude)
         print('solar elevation: ' + str(angle))
         mqtt_publish('solarElevation', str(angle))
         
-        times_setting = geoTime.twilight_utc(astral.SUN_SETTING, dateAndTime, state.latitude, state.longitude, state.elevation)
-        times_rising = geoTime.twilight_utc(astral.SUN_RISING, dateAndTime, state.latitude, state.longitude, state.elevation)
+        times_setting = sun.twilight_utc(sun.SUN_SETTING, dateAndTime, state.latitude, state.longitude, state.elevation)
+        times_rising = sun.twilight_utc(sun.SUN_RISING, dateAndTime, state.latitude, state.longitude, state.elevation)
         if debug:
             print("DEBUG: rising start  " + str(times_rising[0].astimezone(state.timezone)))
             print("DEBUG: rising end    " + str(times_rising[1].astimezone(state.timezone)))
@@ -404,8 +404,7 @@ if __name__ == '__main__':
     for ind in ser:
         print('using COM port: ' + str(ser[ind].port))
     # Initialize astronomical calculator and timezone finder
-    geoTime = astral.Astral()
-    geoTime.solar_depression = 'civil'
+    sun.solar_depression = 'civil'
     timeZoneFinder = timezonefinder.TimezoneFinder()
 
     try:
